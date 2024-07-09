@@ -2,6 +2,8 @@ from sqlalchemy.orm import validates
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import MetaData
+from sqlalchemy.ext.hybrid import hybrid_property
+from config import bcrypt
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 })
@@ -40,6 +42,23 @@ class User(db.Model, SerializerMixin):
     responses = db.relationship('Response', back_populates='user', cascade="all, delete-orphan")
     serialize_rules = ('-user.reviews',)
     roles = db.relationship('Role',back_populates='user', secondary=user_roles)
+
+    @hybrid_property
+    def password_hash(self):
+        raise Exception('Password hashes may not be viewed.')
+
+    @password_hash.setter
+    def password_hash(self, password):
+        password_hash = bcrypt.generate_password_hash(
+            password.encode('utf-8'))
+        self._password_hash = password_hash.decode('utf-8')
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(
+            self._password_hash, password.encode('utf-8'))
+    
+    def __repr__(self):
+        return f'User {self.username}, ID: {self.id}'
 
 class Survey(db.Model, SerializerMixin):
     __tablename__ = 'surveys'
