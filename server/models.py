@@ -3,12 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import MetaData
 from sqlalchemy.ext.hybrid import hybrid_property
-from config import bcrypt
+from flask_bcrypt import Bcrypt
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 })
 
 db = SQLAlchemy(metadata=metadata)
+
+bcrypt = Bcrypt()
 
 
 
@@ -37,7 +39,7 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255))
     username = db.Column(db.String(255))
-    password = db.Column(db.String(255))
+    _password_hash = db.Column(db.String(255))
     reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
     responses = db.relationship('Response', back_populates='user', cascade="all, delete-orphan")
     serialize_rules = ('-user.reviews',)

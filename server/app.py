@@ -1,12 +1,11 @@
 from flask import  Flask, render_template, url_for, request, redirect, session
 from flask_migrate import Migrate
 from flask_restful import Resource, Api
+from flask_bcrypt import Bcrypt
 
 from datetime import timedelta
 
-from config import db
-
-from models import User
+from models import User, db
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///survey.db'
@@ -14,6 +13,7 @@ app.config['SECRET_KEY'] ='ab1479e159f8b60fc6ade3e987a306'
 api = Api(app)
 
 db.init_app(app)
+
 
 migrate = Migrate(app=app, db=db)
 
