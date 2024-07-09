@@ -35,7 +35,7 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255))
     username = db.Column(db.String(255))
-    password = db.Column(db.String(255))
+    password_hash = db.Column(db.String(255))
     reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
     responses = db.relationship('Response', back_populates='user', cascade="all, delete-orphan")
     serialize_rules = ('-user.reviews',)
@@ -62,6 +62,7 @@ class Question(db.Model, SerializerMixin):
     choice_2 = db.Column(db.String(255))
     choice_3 = db.Column(db.String(255))
     choice_4 = db.Column(db.String(255))
+    answer = db.Column (db.String(1))
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     survey = db.relationship('Survey', back_populates='questions')
 
@@ -75,7 +76,7 @@ class Response(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     user = db.relationship('User', back_populates='responses')
-    question = db.relationship('Question')
+    question = db.relationship('Question', back_populates = "")
     survey = db.relationship('Survey')
 
 class Review(db.Model, SerializerMixin):
