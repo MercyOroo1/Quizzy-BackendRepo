@@ -5,8 +5,7 @@ from flask_restful import Resource, Api
 from datetime import timedelta
 
 from models import User, db
-
-# from survey import survey_bp
+from creator import creator_bp
 # from response import response_bp
 
 app = Flask(__name__)
@@ -14,7 +13,7 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///quiz.db'
 app.config['SECRET_KEY'] ='ab1479e159f8b60fc6ade3e987a306'
 api = Api(app)
 
-# app.register_blueprint(survey_bp)
+app.register_blueprint(creator_bp)
 
 db.init_app(app)
 
