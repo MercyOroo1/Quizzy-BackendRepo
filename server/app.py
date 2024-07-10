@@ -11,7 +11,7 @@ from models import User, db
 # from response import response_bp
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///survey.db'
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///quiz.db'
 app.config['SECRET_KEY'] ='ab1479e159f8b60fc6ade3e987a306'
 api = Api(app)
 
