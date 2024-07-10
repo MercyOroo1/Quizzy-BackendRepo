@@ -76,7 +76,46 @@ class Reviews(Resource):
                 "review_text": new_review.review_text,
                 "rating": new_review.rating,
                 "quiz": quiz.title,
-                "user_id": new_review.user_id
+                "user_id": new_review.user_id,
+                "created_at": new_review.created_at
            }, 201)
+class Quizzes(Resource):    
+ def get(self):
+        # gets all quizzes with related questions
+          quizzes = Quiz.query.all()
+          if not quizzes:
+               return {"msg": "No quizzes found"}
+         
+         
+          return jsonify ([{
+                'id':quiz.id,
+                'title':quiz.title,
+                'description': quiz.description,
+                'created_at': quiz.created_at,
+                'updated_at': quiz.updated_at,
+                'questions':[{'question_id':q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4} for q in quiz.questions],
+                'reviews': [{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews],
+          }for quiz in quizzes],200)
+ 
+class QuizzesById(Resource):
+    # gets quiz by id and displays questions 
+     def get(self,id):
+         quiz = Quiz.query.get(id)
+         if not quiz:
+             return {"msg": "quiz not found"}
+         return jsonify({
+                'id':quiz.id,
+                'title':quiz.title,
+                'description': quiz.description,
+                'created_at': quiz.created_at,
+                'updated_at': quiz.updated_at,
+                'questions':[{'question_id': q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4} for q in quiz.questions],
+                'reviews':[{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews]
+
+         })
+    
 participant_api.add_resource(Responses,'/responses')
 participant_api.add_resource(Reviews,'/reviews')
+participant_api.add_resource(Quizzes,'/quizzes')
+participant_api.add_resource(QuizzesById,'/quizzes/<int:id>')
+
