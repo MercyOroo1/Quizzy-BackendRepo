@@ -41,17 +41,17 @@ class User(db.Model, SerializerMixin):
     serialize_rules = ('-user.reviews',)
     roles = db.relationship('Role',back_populates='user', secondary=user_roles)
 
-class Survey(db.Model, SerializerMixin):
-    __tablename__ = 'surveys'
+class Quiz(db.Model, SerializerMixin):
+    __tablename__ = 'quizzes'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255))
     description = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
-    reviews = db.relationship('Review', back_populates='survey')
-    questions = db.relationship('Question', back_populates='survey', cascade="all, delete-orphan")
-    serialize_rules = ('-survey.questions',)
+    reviews = db.relationship('Review', back_populates='quiz')
+    questions = db.relationship('Question', back_populates='quiz', cascade="all, delete-orphan")
+    serialize_rules = ('-quiz.questions',)
 
 class Question(db.Model, SerializerMixin):
     __tablename__ = 'questions'
@@ -63,21 +63,21 @@ class Question(db.Model, SerializerMixin):
     choice_3 = db.Column(db.String(255))
     choice_4 = db.Column(db.String(255))
     answer = db.Column (db.String(1))
-    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
-    survey = db.relationship('Survey', back_populates='questions')
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'))
+    quiz = db.relationship('Quiz', back_populates='questions')
 
 class Response(db.Model, SerializerMixin):
     __tablename__ = 'responses'
 
     id = db.Column(db.Integer, primary_key=True)
     response = db.Column(db.String(255))
-    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'))
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     user = db.relationship('User', back_populates='responses')
-    question = db.relationship('Question', back_populates = "")
-    survey = db.relationship('Survey')
+    question = db.relationship('Question', back_populates = "responses")
+    quiz = db.relationship('Quiz', back_populates = "responses")
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
@@ -86,7 +86,7 @@ class Review(db.Model, SerializerMixin):
     rating = db.Column(db.Integer)
     review_text = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
-    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    survey = db.relationship('Survey', back_populates='reviews')
+    quiz = db.relationship('Quiz', back_populates='reviews')
     user = db.relationship('User', back_populates='reviews')
