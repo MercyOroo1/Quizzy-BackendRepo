@@ -1,6 +1,6 @@
 from flask import Blueprint,jsonify
 from flask_jwt_extended import jwt_required, current_user
-from models import db, Quiz, Question
+from models import db, Quiz, Question,Response,Review
 from flask_restful import Api, Resource, reqparse
 # from auth import allow
 
@@ -46,7 +46,7 @@ class Quizzes(Resource):
                 'created_at': quiz.created_at,
                 'updated_at': quiz.updated_at,
                 'questions':[{'question_id':q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4,'answer': q.answer } for q in quiz.questions],
-                'reviews': quiz.reviews
+                'reviews': [{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews],
           }for quiz in quizzes])
     
 class QuizzesById(Resource):
@@ -63,7 +63,7 @@ class QuizzesById(Resource):
                 'created_at': quiz.created_at,
                 'updated_at': quiz.updated_at,
                 'questions':[{'question_id': q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4, 'answer': q.answer} for q in quiz.questions],
-                'reviews': quiz.reviews
+                'reviews':[{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews]
 
          })
     #  changes quiz description or title
@@ -170,14 +170,43 @@ class QuestionsById(Resource):
     },{"msg": "Question updated successfully"},201)
      
 
+class QuestionResponses(Resource):
+    # creator gets all responses of a particular question
+    def get(self, id):
+        question = Question.query.get(id)
+        if not question:
+            return {"msg": "Question not found"}, 404
+        
+        responses = Response.query.filter_by(question_id=question.id).all()
+        
+        return jsonify([{
+            "id": response.id,
+            "response": response.response,
+            "user_id": response.user_id,
+        } for response in responses],200)
 
 
+class QuizReviews(Resource):
+    # gets all reviews of a specific quiz
+    def get(self,id):
+        quiz = Quiz.query.get(id)
+        if not quiz:
+            return{"msg":"quiz not found"},404
+        reviews = Review.query.filter_by(quiz_id = quiz.id).all()
 
+        return jsonify ([{
+            "id": review.id,
+            "rating": review.rating,
+            "review_text": review.review_text,
+            "user_id":review.user_id
+                                                                    }for review in reviews], 200)
 
 
 creator_api.add_resource(Quizzes,"/quizzes")
 creator_api.add_resource(QuizzesById,"/quizzes/<int:id>")
 creator_api.add_resource(Questions,"/questions")
 creator_api.add_resource(QuestionsById,"/questions/<int:id>")
+creator_api.add_resource(QuestionResponses,"/questions/<int:id>/responses")
+creator_api.add_resource(QuizReviews,"/quizzes/<int:id>/reviews")
 
 

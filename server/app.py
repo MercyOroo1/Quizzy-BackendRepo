@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from models import User, db
 from creator import creator_bp
+from participant import participant_bp
 # from response import response_bp
 
 app = Flask(__name__)
@@ -14,6 +15,9 @@ app.config['SECRET_KEY'] ='ab1479e159f8b60fc6ade3e987a306'
 api = Api(app)
 
 app.register_blueprint(creator_bp)
+app.register_blueprint(participant_bp)
+
+
 
 db.init_app(app)
 
