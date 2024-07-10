@@ -1,7 +1,6 @@
 from flask import  Flask, render_template, url_for, request, redirect, session
 from flask_migrate import Migrate
 from flask_restful import Resource, Api
-from flask_bcrypt import Bcrypt
 
 from datetime import timedelta
 
@@ -18,6 +17,8 @@ api = Api(app)
 # app.register_blueprint(survey_bp)
 
 db.init_app(app)
+
+
 
 
 migrate = Migrate(app=app, db=db)

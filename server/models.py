@@ -2,11 +2,15 @@ from sqlalchemy.orm import validates
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import MetaData
+from flask_bcrypt import Bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 })
 
 db = SQLAlchemy(metadata=metadata)
+
+bcrypt = Bcrypt()
 
 
 
@@ -35,11 +39,28 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255))
     username = db.Column(db.String(255))
-    password_hash = db.Column(db.String(255))
+    _password_hash = db.Column(db.String(255))
     reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
     responses = db.relationship('Response', back_populates='user', cascade="all, delete-orphan")
     serialize_rules = ('-user.reviews',)
     roles = db.relationship('Role',back_populates='user', secondary=user_roles)
+
+    @hybrid_property
+    def password_hash(self):
+        raise Exception('Password hashes may not be viewed.')
+
+    @password_hash.setter
+    def password_hash(self, password):
+        password_hash = bcrypt.generate_password_hash(
+            password.encode('utf-8'))
+        self._password_hash = password_hash.decode('utf-8')
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(
+            self._password_hash, password.encode('utf-8'))
+
+
+
 
 class Quiz(db.Model, SerializerMixin):
     __tablename__ = 'quizzes'
