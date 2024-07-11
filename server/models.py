@@ -2,6 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
+
 user_roles = db.Table(
     "user_roles",
     db.Column("role_id", db.Integer, db.ForeignKey("roles.id")),
@@ -18,6 +20,7 @@ class User(db.Model):
     roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
     reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
     responses = db.relationship('Response', back_populates='user', cascade="all, delete-orphan")
+    
 
 class Role(db.Model):
     __tablename__ = 'roles'
