@@ -2,7 +2,7 @@ from flask import Blueprint,jsonify
 from flask_jwt_extended import jwt_required, current_user
 from models import db, Quiz, Question, Response,Review
 from flask_restful import Api, Resource, reqparse
-# from auth import allow
+from auth import allow
 
 participant_bp = Blueprint('participant_bp',__name__, url_prefix='/participant')
 
@@ -10,17 +10,20 @@ participant_api = Api(participant_bp)
 response_args = reqparse.RequestParser()
 response_args.add_argument('response', type=str, required=True, help='A response is required')
 response_args.add_argument('question_id', type=str, required=True, help='Question id is required')
-response_args.add_argument('user_id', type=str, required=True, help='User id is required')
+# response_args.add_argument('user_id', type=str, required=True, help='User id is required')
 
 
 
 class Responses(Resource):
+    @jwt_required()
+    # user has to be logged in 
     def post(self):
-        # participant creates a response to a particular question
+        # participant creates a response to a particular 
+        
         data = response_args.parse_args()
         response = data['response']
         question_id = data['question_id']
-        user_id = data['user_id']
+        user_id = current_user.id
 
         # (will be replaced with current_user)
 
@@ -42,7 +45,8 @@ class Responses(Resource):
             # (question id should be equal to id of the question that is fetched)
              'question': question.text,
              'is_correct': is_correct,
-             'quiz_id': question.quiz_id
+             'quiz_id': question.quiz_id,
+             'user_id': current_user.id
 
         
 
@@ -55,10 +59,11 @@ review_args = reqparse.RequestParser()
 review_args.add_argument('rating', type=int, required=True, help='A rating is required')
 review_args.add_argument('review_text', type=str, required=True, help='review text is required')
 review_args.add_argument('quiz_id', type=str, required=True, help='Quiz id is required')
-review_args.add_argument('user_id', type=str, required=True, help='User id is required')
+# review_args.add_argument('user_id', type=str, required=True, help='User id is required')
 # will be replaced with current user 
 class Reviews(Resource):
     #   participant creates a review of a particular quiz
+      @jwt_required()
       def post(self):
            data = review_args.parse_args()
            quiz_id = data['quiz_id']
@@ -66,7 +71,7 @@ class Reviews(Resource):
            if not quiz:
                 return {'msg': "quiz not found"}
            
-           new_review = Review(rating = data['rating'],review_text = data['review_text'], quiz_id = quiz_id, user_id = data['user_id'])
+           new_review = Review(rating = data['rating'],review_text = data['review_text'], quiz_id = quiz_id, user_id = current_user.id)
            
            db.session.add(new_review)
            db.session.commit()
@@ -76,10 +81,12 @@ class Reviews(Resource):
                 "review_text": new_review.review_text,
                 "rating": new_review.rating,
                 "quiz": quiz.title,
-                "user_id": new_review.user_id,
+                "user_id": current_user.id,
                 "created_at": new_review.created_at
            }, 201)
-class Quizzes(Resource):    
+class Quizzes(Resource):  
+ @jwt_required()
+ 
  def get(self):
         # gets all quizzes with related questions
           quizzes = Quiz.query.all()
@@ -98,6 +105,7 @@ class Quizzes(Resource):
           }for quiz in quizzes],200)
  
 class QuizzesById(Resource):
+     @jwt_required()
     # gets quiz by id and displays questions 
      def get(self,id):
          quiz = Quiz.query.get(id)
