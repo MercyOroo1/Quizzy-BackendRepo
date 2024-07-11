@@ -1,6 +1,8 @@
-from flask import  Flask, render_template, url_for, request, redirect, session
+from flask import  Flask, render_template, url_for, request, redirect, session, jsonify
 from flask_migrate import Migrate
 from flask_restful import Resource, Api
+from flask_cors import CORS
+import pandas as pd
 
 from datetime import timedelta
 
@@ -14,15 +16,12 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///quiz.db'
 app.config['SECRET_KEY'] ='ab1479e159f8b60fc6ade3e987a306'
 api = Api(app)
 
+CORS(app)
+
 app.register_blueprint(creator_bp)
 app.register_blueprint(participant_bp)
 
-
-
 db.init_app(app)
-
-
-
 
 migrate = Migrate(app=app, db=db)
 
@@ -30,16 +29,16 @@ class Login(Resource):
     def post(self):
         all_requests = request.get_json()
 
-        username = all_requests['username']
+        email = all_requests['email']
         password = all_requests['password']
 
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter(email=email).first
 
         if user and user.authenticate(password):
             session['user_id'] = user.id
             return user.to_dict(), 200
         else:
-            return {'message': 'Invalid username or password'}, 401
+            return {'message': 'Invalid email or password'}, 401
         
 class Logout(Resource):
     def delete(self):
@@ -57,17 +56,17 @@ class CheckSession(Resource):
 class Signup(Resource):
     def post(self):
 
+        email = request.get_json('email')
         username = request.get_json()['username']
         password = request.get_json()['password']
         
-        if username and password:
-            user = User(username=username)
-            user.password_hash = password
+        if username and password and email:
+            user = User(username=username, email=email)
+            user._password_hash = password
             db.session.add(user)
             db.session.commit()
 
             session['user_id'] = user.id
-
             return user.to_dict(), 201
         
         return {'message': 'Username or password missing'}, 422
