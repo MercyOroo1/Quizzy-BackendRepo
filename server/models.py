@@ -1,10 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from sqlalchemy.ext.hybrid import hybrid_property
 
 db = SQLAlchemy()
 
-bcrypt = Bcrypt()
+
 
 user_roles = db.Table(
     "user_roles",
@@ -18,27 +16,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255))
     username = db.Column(db.String(255))
-    _password_hash = db.Column(db.String(255))
+    password_hash = db.Column(db.String(255))
     roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
     reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
     responses = db.relationship('Response', back_populates='user', cascade="all, delete-orphan")
-
-    @hybrid_property
-    def password_hash(self):
-        raise Exception('Password hashes may not be viewed.')
-
-    @password_hash.setter
-    def password_hash(self, password):
-        password_hash = bcrypt.generate_password_hash(
-            password.encode('utf-8'))
-        self._password_hash = password_hash.decode('utf-8')
-
-    def authenticate(self, password):
-        return bcrypt.check_password_hash(
-            self._password_hash, password.encode('utf-8'))
-
-    def __repr__(self):
-        return f'User {self.username}, ID: {self.id}'
+    
 
 class Role(db.Model):
     __tablename__ = 'roles'
