@@ -22,11 +22,17 @@ class User(db.Model):
     responses = db.relationship('Response', back_populates='user', cascade="all, delete-orphan")
     
 
+    def __repr__(self):
+        return f'<Email {self.email} | Username: {self.username} | Role : {self.roles}>'
+
 class Role(db.Model):
     __tablename__ = 'roles'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<ID {self.id} | Name: {self.name}>'
 
 class Quiz(db.Model):
     __tablename__ = 'quizzes'

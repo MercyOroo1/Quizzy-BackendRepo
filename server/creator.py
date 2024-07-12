@@ -16,7 +16,7 @@ quiz_args.add_argument('description', type=str, required=True, help='quiz descri
 class Quizzes(Resource):
     # creates a quiz with no questions
     @jwt_required()
-    @allow('creator')
+    @allow('admin')
     def post(self):
         data = quiz_args.parse_args()
         new_quiz = Quiz(
@@ -34,7 +34,7 @@ class Quizzes(Resource):
         'updated_at': new_quiz.updated_at
     },{"msg": "Quiz created successfully"},201)
     @jwt_required()
-    @allow('creator')    
+    @allow('Admin')    
     def get(self):
           
         # gets all quizzes with related questions and answers
@@ -57,7 +57,7 @@ class QuizzesById(Resource):
     #  a creator can see the answers but the participants cannot
     # gets quiz by id and displays questions and answers
      @jwt_required()
-     @allow('creator')
+     @allow('Admin')
      def get(self,id):
          quiz = Quiz.query.get(id)
          if not quiz:
@@ -73,6 +73,8 @@ class QuizzesById(Resource):
 
          })
     #  changes quiz description or title
+     @jwt_required()
+     @allow('Admin')
      def patch(self,id):
           data = quiz_args.parse_args()
           quiz = Quiz.query.get(id)
@@ -92,7 +94,8 @@ class QuizzesById(Resource):
         'created_at': quiz.created_at,
         'updated_at': quiz.updated_at
     },{"msg": "Quiz updated successfully"},201)
-     
+     @jwt_required()
+     @allow('Admin')
      def delete(self, id):
       quiz = Quiz.query.get(id)
 
@@ -117,7 +120,7 @@ questions_args.add_argument('quiz_id', type=int, required=True, help='quiz id is
 class Questions(Resource):
     # creates questions and assigns them to a specific quiz
     @jwt_required()
-    @allow('creator')
+    @allow('Admin')
     def post(self):
       data = questions_args.parse_args()
       
@@ -145,7 +148,7 @@ class Questions(Resource):
 #  creator can update questions 
 class QuestionsById(Resource):
     @jwt_required()
-    @allow('creator')
+    @allow('Admin')
     def patch(self,id):
         data = questions_args.parse_args()
         question = Question.query.get(id)
@@ -183,7 +186,7 @@ class QuestionsById(Resource):
 class QuestionResponses(Resource):
     # creator gets all responses of a particular question
     @jwt_required()
-    @allow('creator')
+    @allow('Admin')
     def get(self, id):
         question = Question.query.get(id)
         if not question:
@@ -201,7 +204,7 @@ class QuestionResponses(Resource):
 class QuizReviews(Resource):
     # gets all reviews of a specific quiz
     @jwt_required()
-    @allow('creator')
+    @allow('Admin')
     def get(self,id):
         quiz = Quiz.query.get(id)
         if not quiz:

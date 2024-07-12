@@ -1,0 +1,116 @@
+from app import app
+from models import User, Role, Quiz, Question, Response, Review, db
+
+def delete_tables():
+    db.session.query(Response).delete()
+    db.session.query(Review).delete()
+    db.session.query(Question).delete()
+    db.session.query(Quiz).delete()
+    db.session.query(User).delete()
+    db.session.query(Role).delete()
+    db.session.commit()
+
+def create_roles():
+    roles = ['Admin', 'User']
+    for role in roles:
+        db.session.add(Role(name=role))
+    db.session.commit()
+
+def create_users():
+    users = [
+        {'email': 'admin@example.com', 'username': 'admin', 'password_hash': '12345678', 'role': 'Admin'},
+        {'email': 'user1@example.com', 'username': 'user1', 'password_hash': 'hashed_user1_password', 'role': 'User'},
+        {'email': 'user2@example.com', 'username': 'user2', 'password_hash': 'hashed_user2_password', 'role': 'User'}
+    ]
+    for user_data in users:
+        user = User(
+            email=user_data['email'],
+            username=user_data['username'],
+            password_hash=user_data['password_hash']
+        )
+        user.roles.append(Role.query.filter_by(name=user_data['role']).first())
+        db.session.add(user)
+    db.session.commit()
+
+def create_quizzes():
+    quizzes = [
+        {'title': 'Sample Quiz 1', 'description': 'This is a sample quiz 1'},
+        {'title': 'Sample Quiz 2', 'description': 'This is a sample quiz 2'}
+    ]
+    for quiz_data in quizzes:
+        quiz = Quiz(
+            title=quiz_data['title'],
+            description=quiz_data['description']
+        )
+        db.session.add(quiz)
+    db.session.commit()
+
+def create_questions():
+    quizzes = Quiz.query.all()
+    questions = [
+        {'text': 'What is the capital of France?', 'choice_1': 'Paris', 'choice_2': 'London', 'choice_3': 'Berlin', 'choice_4': 'Madrid', 'answer': 'A'},
+        {'text': 'What is 2 + 2?', 'choice_1': '3', 'choice_2': '4', 'choice_3': '5', 'choice_4': '6', 'answer': 'B'}
+    ]
+    for quiz in quizzes:
+        for question_data in questions:
+            question = Question(
+                text=question_data['text'],
+                choice_1=question_data['choice_1'],
+                choice_2=question_data['choice_2'],
+                choice_3=question_data['choice_3'],
+                choice_4=question_data['choice_4'],
+                answer=question_data['answer'],
+                quiz_id=quiz.id
+            )
+            db.session.add(question)
+    db.session.commit()
+
+def create_responses():
+    users = User.query.all()
+    questions = Question.query.all()
+    responses = [
+        {'response': 'A'},
+        {'response': 'B'}
+    ]
+    for user in users:
+        for question, response_data in zip(questions, responses):
+            response = Response(
+                response=response_data['response'],
+                quiz_id=question.quiz_id,
+                question_id=question.id,
+                user_id=user.id
+            )
+            db.session.add(response)
+    db.session.commit()
+
+def create_reviews():
+    users = User.query.all()
+    quizzes = Quiz.query.all()
+    reviews = [
+        {'rating': 5, 'review_text': 'Great quiz!'},
+        {'rating': 4, 'review_text': 'Good quiz!'}
+    ]
+    for user in users:
+        for quiz, review_data in zip(quizzes, reviews):
+            review = Review(
+                rating=review_data['rating'],
+                review_text=review_data['review_text'],
+                quiz_id=quiz.id,
+                user_id=user.id
+            )
+            db.session.add(review)
+    db.session.commit()
+
+def seed():
+    delete_tables()
+    create_roles()
+    create_users()
+    create_quizzes()
+    create_questions()
+    create_responses()
+    create_reviews()
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Make sure all tables are created
+        seed()
