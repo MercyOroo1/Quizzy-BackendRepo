@@ -121,9 +121,28 @@ class QuizzesById(Resource):
                 'reviews':[{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews]
 
          })
-    
+class QuizQuestions(Resource):
+     @jwt_required()
+     def get(self,id):
+          quiz = Quiz.query.get(id)
+          if not quiz:
+               return {'Quiz not found'}
+          questions = Question.query.filter_by(quiz_id = quiz.id).all()
+          if not questions: 
+               return {"Quiz has no questions"}
+
+          return  jsonify ([{
+            "question_text": question.text,
+            "choice_1": question.choice_1,
+            "choice_2": question.choice_2,
+            "choice_3":question.choice_3,
+            "choice_4":question.choice_4,
+
+          
+          }for question in questions])
 participant_api.add_resource(Responses,'/responses')
 participant_api.add_resource(Reviews,'/reviews')
 participant_api.add_resource(Quizzes,'/quizzes')
 participant_api.add_resource(QuizzesById,'/quizzes/<int:id>')
+participant_api.add_resource(QuizQuestions,'/quizzes/<int:id>/questions')
 
