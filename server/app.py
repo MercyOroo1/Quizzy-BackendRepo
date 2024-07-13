@@ -76,6 +76,9 @@ signup_args.add_argument('username', required=True, help='Username cannot be bla
 class Signup(Resource):
     def post(self):
         data = signup_args.parse_args()
+        if User.query.filter_by(username=data.get('username')).first():
+            return {'error': 'Username already exists'}, 422
+
         hashed_password = bcrypt.generate_password_hash(data.get('password')).decode('utf-8')
         new_user = User(email=data.get('email'), username=data.get('username'), password_hash=hashed_password)
         db.session.add(new_user)
