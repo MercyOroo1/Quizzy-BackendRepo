@@ -11,6 +11,11 @@ from flask_cors import CORS
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
 app.config['SECRET_KEY'] = 'ab1479e159f8b60fc6ade3e987a306'
+from datetime import timedelta
+
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)  
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True  
+
 api = Api(app)
 
 app.register_blueprint(creator_bp)
