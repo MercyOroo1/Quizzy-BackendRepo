@@ -16,7 +16,7 @@ quiz_args.add_argument('description', type=str, required=True, help='quiz descri
 class Quizzes(Resource):
     # creates a quiz with no questions
     @jwt_required()
-    @allow('admin')
+    @allow('Admin')
     def post(self):
         data = quiz_args.parse_args()
         new_quiz = Quiz(
@@ -32,7 +32,7 @@ class Quizzes(Resource):
         'description': new_quiz.description,
         'created_at': new_quiz.created_at,
         'updated_at': new_quiz.updated_at
-    },{"msg": "Quiz created successfully"},201)
+    })
     @jwt_required()
     @allow('Admin')    
     def get(self):
@@ -105,7 +105,7 @@ class QuizzesById(Resource):
       db.session.delete(quiz)
       db.session.commit()
 
-      return {'msg': "Quiz deleted successfully"}, 204  
+      return jsonify({'msg': "Quiz deleted successfully"}, 204 ) 
      
 questions_args = reqparse.RequestParser()
 questions_args.add_argument('text', type=str, required=True, help='question is required')
@@ -138,13 +138,14 @@ class Questions(Resource):
 
       return jsonify({
         'id':new_question.id,
+        'text': new_question.text,
         'choice_1': new_question.choice_1,
         'choice_2': new_question.choice_2,
         'choice_3': new_question.choice_3,
         'choice_4': new_question.choice_4,
         'answer': new_question.answer,
         "quiz_id": new_question.quiz_id
-    },{"msg": "Question created successfully"},201)
+    },201)
 #  creator can update questions 
 class QuestionsById(Resource):
     @jwt_required()
@@ -204,7 +205,7 @@ class QuestionResponses(Resource):
 class QuizReviews(Resource):
     # gets all reviews of a specific quiz
     @jwt_required()
-    @allow('Admin')
+    # @allow('Admin')
     def get(self,id):
         quiz = Quiz.query.get(id)
         if not quiz:
@@ -215,8 +216,9 @@ class QuizReviews(Resource):
             "id": review.id,
             "rating": review.rating,
             "review_text": review.review_text,
-            "user_id":review.user_id
-                                                                    }for review in reviews], 200)
+            "user_id":review.user_id,
+            "quiz_id": review.quiz_id
+                                                                    }for review in reviews])
 
 
 creator_api.add_resource(Quizzes,"/quizzes")

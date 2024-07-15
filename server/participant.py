@@ -81,9 +81,10 @@ class Reviews(Resource):
                 "review_text": new_review.review_text,
                 "rating": new_review.rating,
                 "quiz": quiz.title,
+                "quiz_id":new_review.quiz_id,
                 "user_id": current_user.id,
                 "created_at": new_review.created_at
-           }, 201)
+           })
 class Quizzes(Resource):  
  @jwt_required()
  
@@ -102,7 +103,7 @@ class Quizzes(Resource):
                 'updated_at': quiz.updated_at,
                 'questions':[{'question_id':q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4} for q in quiz.questions],
                 'reviews': [{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews],
-          }for quiz in quizzes],200)
+          }for quiz in quizzes])
  
 class QuizzesById(Resource):
      @jwt_required()
@@ -132,6 +133,7 @@ class QuizQuestions(Resource):
                return {"Quiz has no questions"}
 
           return  jsonify ([{
+            "id": question.id,
             "question_text": question.text,
             "choice_1": question.choice_1,
             "choice_2": question.choice_2,
