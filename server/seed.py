@@ -34,8 +34,8 @@ def create_users():
 
 def create_quizzes():
     quizzes = [
-        {'title': 'Sample Quiz 1', 'description': 'This is a sample quiz 1'},
-        {'title': 'Sample Quiz 2', 'description': 'This is a sample quiz 2'}
+        {'title': 'Sample Quiz 1', 'description': 'This is a sample quiz 1', 'image_url': 'https://www.google.com/imgres?q=Globe%20png%20Image&imgurl=http%3A%2F%2Fatlas-content-cdn.pixelsquid.com%2Fstock-images%2Fearth-k1kYV36-600.jpg&imgrefurl=https%3A%2F%2Fwww.pixelsquid.com%2Fpng%2Fearth-2045628189572601703&docid=FLHLpVNHrrYj5M&tbnid=gHbwitgw8QJYzM&vet=12ahUKEwiNz7i0iKeHAxV9VaQEHVwsDoUQM3oFCIcBEAA..i&w=600&h=600&hcb=2&ved=2ahUKEwiNz7i0iKeHAxV9VaQEHVwsDoUQM3oFCIcBEAA'},
+        {'title': 'Sample Quiz 2', 'description': 'This is a sample quiz 2', 'image_url':'https://www.google.com/imgres?q=Globe%20png%20Image&imgurl=https%3A%2F%2Fpurepng.com%2Fpublic%2Fuploads%2Flarge%2Fglobe-br7.png&imgrefurl=https%3A%2F%2Fpnghunter.com%2Fpng%2Fglobe-8%2F&docid=WYn2V0xgpuBEXM&tbnid=cKdBzhnApMSNbM&vet=12ahUKEwiNz7i0iKeHAxV9VaQEHVwsDoUQM3oECDoQAA..i&w=2246&h=2273&hcb=2&ved=2ahUKEwiNz7i0iKeHAxV9VaQEHVwsDoUQM3oECDoQAA'}
     ]
     for quiz_data in quizzes:
         quiz = Quiz(
@@ -48,8 +48,8 @@ def create_quizzes():
 def create_questions():
     quizzes = Quiz.query.all()
     questions = [
-        {'text': 'What is the capital of France?', 'choice_1': 'Paris', 'choice_2': 'London', 'choice_3': 'Berlin', 'choice_4': 'Madrid', 'answer': 'A'},
-        {'text': 'What is 2 + 2?', 'choice_1': '3', 'choice_2': '4', 'choice_3': '5', 'choice_4': '6', 'answer': 'B'}
+        {'text': 'What is the capital of France?', 'choice_1': 'Paris', 'choice_2': 'London', 'choice_3': 'Berlin', 'choice_4': 'Madrid', 'answer': 1},
+        {'text': 'What is 2 + 2?', 'choice_1': '3', 'choice_2': '4', 'choice_3': '5', 'choice_4': '6', 'answer': 2}
     ]
     for quiz in quizzes:
         for question_data in questions:

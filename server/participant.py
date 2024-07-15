@@ -84,14 +84,28 @@ class Reviews(Resource):
                 "user_id": current_user.id,
                 "created_at": new_review.created_at
            }, 201)
+      
+      def get(self):
+           reviews = Review.query.all()
+           if not reviews:
+                return {"msg": "No reviews found"}, 404
+           return jsonify ([{
+                'id': review.id,
+                'rating': review.rating,
+                'review_text': review.review_text,
+                'quiz_id': review.quiz_id,
+                'user_id': review.user_id,
+                'created_at': review.created_at,
+                'user': {'id': review.user_id, 'username': review.user.username}
+                } for review in reviews], 200)
 class Quizzes(Resource):  
- @jwt_required()
+#  @jwt_required()
  
  def get(self):
         # gets all quizzes with related questions
           quizzes = Quiz.query.all()
           if not quizzes:
-               return {"msg": "No quizzes found"}
+               return {"msg": "No quizzes found"}, 404
          
          
           return jsonify ([{
@@ -100,12 +114,13 @@ class Quizzes(Resource):
                 'description': quiz.description,
                 'created_at': quiz.created_at,
                 'updated_at': quiz.updated_at,
+                'image-url': quiz.image_url,
                 'questions':[{'question_id':q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4} for q in quiz.questions],
                 'reviews': [{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews],
           }for quiz in quizzes],200)
  
 class QuizzesById(Resource):
-     @jwt_required()
+     # @jwt_required()
     # gets quiz by id and displays questions 
      def get(self,id):
          quiz = Quiz.query.get(id)
@@ -117,7 +132,7 @@ class QuizzesById(Resource):
                 'description': quiz.description,
                 'created_at': quiz.created_at,
                 'updated_at': quiz.updated_at,
-                'questions':[{'question_id': q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4} for q in quiz.questions],
+                'questions':[{'question_id': q.id,'question_text':q.text, 'choice_1': q.choice_1,'choice_2': q.choice_2,'choice_3': q.choice_3,'choice_4': q.choice_4, 'answer':q.answer} for q in quiz.questions],
                 'reviews':[{'review_id':r.id,'rating':r.rating, 'review_text': r.review_text,'user_id': r.user_id} for r in quiz.reviews]
 
          })

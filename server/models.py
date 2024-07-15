@@ -42,6 +42,7 @@ class Quiz(db.Model):
     description = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+    image_url = db.Column(db.String(10000))
     questions = db.relationship('Question', back_populates='quiz', cascade="all, delete-orphan")
     reviews = db.relationship('Review', back_populates='quiz', cascade="all, delete-orphan")
     responses = db.relationship('Response', back_populates='quiz', cascade="all, delete-orphan")  # Added this line
