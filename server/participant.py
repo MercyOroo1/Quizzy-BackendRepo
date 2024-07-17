@@ -85,6 +85,20 @@ class Reviews(Resource):
                 "user_id": current_user.id,
                 "created_at": new_review.created_at
            })
+      
+      def get(self):
+           # gets all reviews related to a particular quiz
+           reviews = Review.query.all()
+           if not reviews:
+               return {"msg": "No reviews found"}
+           return jsonify ([{
+                'id':review.id,
+                "review_text": review.review_text,
+                "rating": review.rating,
+                "quiz_id":review.quiz_id,
+                "user_id": review.user_id,
+                "created_at": review.created_at
+           }for review in reviews])
 class Quizzes(Resource):  
  @jwt_required()
  

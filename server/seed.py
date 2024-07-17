@@ -1,5 +1,6 @@
 from app import app
 from models import User, Role, Quiz, Question, Response, Review, db
+from app import bcrypt
 
 def delete_tables():
     db.session.query(Response).delete()
@@ -18,15 +19,16 @@ def create_roles():
 
 def create_users():
     users = [
-        {'email': 'admin@example.com', 'username': 'admin', 'password_hash': '12345678', 'role': 'Admin'},
+        {'email': 'admin@example.com', 'username': 'admin', 'password_hash': '123456789', 'role': 'Admin'},
         {'email': 'user1@example.com', 'username': 'user1', 'password_hash': 'hashed_user1_password', 'role': 'User'},
         {'email': 'user2@example.com', 'username': 'user2', 'password_hash': 'hashed_user2_password', 'role': 'User'}
     ]
     for user_data in users:
+        hashed_password = bcrypt.generate_password_hash(user_data['password_hash']).decode('utf-8')
         user = User(
             email=user_data['email'],
             username=user_data['username'],
-            password_hash=user_data['password_hash']
+            password_hash=hashed_password,
         )
         user.roles.append(Role.query.filter_by(name=user_data['role']).first())
         db.session.add(user)
@@ -48,8 +50,8 @@ def create_quizzes():
 def create_questions():
     quizzes = Quiz.query.all()
     questions = [
-        {'text': 'What is the capital of France?', 'choice_1': 'Paris', 'choice_2': 'London', 'choice_3': 'Berlin', 'choice_4': 'Madrid', 'answer': 1},
-        {'text': 'What is 2 + 2?', 'choice_1': '3', 'choice_2': '4', 'choice_3': '5', 'choice_4': '6', 'answer': 2}
+        {'text': 'What is the capital of France?', 'choice_1': 'Paris', 'choice_2': 'London', 'choice_3': 'Berlin', 'choice_4': 'Madrid', 'answer': 'A'},
+        {'text': 'What is 2 + 2?', 'choice_1': '3', 'choice_2': '4', 'choice_3': '5', 'choice_4': '6', 'answer': 'B'}
     ]
     for quiz in quizzes:
         for question_data in questions:
